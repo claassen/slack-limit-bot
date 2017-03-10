@@ -13,34 +13,14 @@ function cleanMessage(message) {
 
 app.get('/', function (req, res) {
 
-  // slack.oauth.access({
-    // client_id: '10625403026.152416984450',
-    // client_secret: '83521f96743d37688dfd0447ebf8604f',
-    // code:
-  // }, function(err, data) {
-    // console.log("oauth err:");
-    // console.log(err);
-
-    slack.api.postMessage({
-      token: process.env.SLACK_TOKEN
-      channel: 'test1234',
-      text: 'Test'
-    }, function(err, data){
-      console.log("postMessage err:");
-      console.log(err);
-    });
-  // });
-
-
-  // slack.chat.update({
-  //   token: 'xoxb-152443448708-k1oT6hddw4U9LMveYGR9DZSh',
-  //   ts: req.ts,
-  //   channel: req.channel,
-  //   text: cleanMessage(req.text),
-  //   as_user: true
-  // }, function(err, data){
-  //
-  // });
+  slack.api.postMessage({
+    token: process.env.SLACK_TOKEN,
+    channel: 'test1234',
+    text: 'Test'
+  }, function(err, data){
+    console.log("postMessage err:");
+    console.log(err);
+  });
 
   res.send('OK');
 })
