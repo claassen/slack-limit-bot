@@ -13,7 +13,7 @@ function cleanMessage(message) {
 
 app.get('/', function (req, res) {
 
-  slack.api.postMessage({
+  slack.api.chat.postMessage({
     token: process.env.SLACK_TOKEN,
     channel: 'test1234',
     text: 'Test'
