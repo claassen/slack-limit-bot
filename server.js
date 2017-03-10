@@ -22,7 +22,7 @@ app.get('/', function (req, res) {
 
     slack.api.postMessage({
       token: data.access_token, //'xoxb-152443448708-k1oT6hddw4U9LMveYGR9DZSh'
-      channel: 'test1234'
+      channel: 'test1234',
       text: 'Test'
     }, function(err, data){
       console.log("postMessage err:");
