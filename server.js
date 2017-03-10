@@ -13,8 +13,16 @@ function cleanMessage(message) {
 
 app.get('/', function (req, res) {
 
+  slack.api.postMessage({
+    token: 'xoxb-152443448708-k1oT6hddw4U9LMveYGR9DZSh'
+    channel: 'test1234'
+    text: 'Test'
+  }, function(err, data){
+    return data + "-" + err;
+  });
+
   // slack.chat.update({
-  //   token: '...',
+  //   token: 'xoxb-152443448708-k1oT6hddw4U9LMveYGR9DZSh',
   //   ts: req.ts,
   //   channel: req.channel,
   //   text: cleanMessage(req.text),
