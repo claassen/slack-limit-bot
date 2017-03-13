@@ -44,9 +44,15 @@ app.post('/event', function(req, res) {
 
   var event = req.body.event;
 
+  if(event.subtype === "message_changed") {
+    console.log("ignoring message_changed event");
+
+    res.end('OK');
+    return;
+  }
+
   var user = event.user;
   var channel = event.channel;
-  var ts = event.ts;
   var text = event.text;
 
   var stfuUser = stfuUsers[user];
