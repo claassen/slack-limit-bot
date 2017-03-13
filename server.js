@@ -83,7 +83,7 @@ app.post('/event', function(req, res) {
 
       if(stfuUser.currentRate > 0.00003333333333) { //1/30 seconds
         console.log("rate exceeds limit, posting message");
-        
+
         slack.chat.postMessage({
           token: process.env.SLACK_TOKEN,
           channel: channel,
@@ -115,7 +115,11 @@ app.post('/slash', function(req, res) {
   var text = req.body.text;
 
   if(command === "/limit") {
+    console.log("processing limit command");
+
     var stfuUserId = text.split("|")[0].replace("@", "").replace("<", "").replace(">", "");
+
+    console.log("user id: " + stfuUserId);
 
     var stfuUser = stfuUsers[stfuUserId];
 
@@ -129,7 +133,11 @@ app.post('/slash', function(req, res) {
     }
   }
   else if(command === "/unlimit") {
-    var stfuUserId = text.replace("<", "").replace(">", "");
+    console.log("processing limit command");
+
+    var stfuUserId = text.split("|")[0].replace("@", "").replace("<", "").replace(">", "");
+
+    console.log("user id: " + stfuUserId);
 
     stfuUsers[stfuUserId] = undefined;
   }
