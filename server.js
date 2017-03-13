@@ -48,14 +48,48 @@ app.post('/event', function(req, res) {
   var ts = event.ts;
   var text = event.text;
 
-  if(stfuUsers[user]) {
+  var stfuUser = stfuUsers[user];
 
+  if(stfuUser && stfuUser.enabled) {
+    var now = Date.now();
+
+    var lastPostTime = stfuUser.lastPostTime;
+
+    if(lastPostTime) {
+      var diff = now - lastPost;
+
+      if(stfuUser.currentRate) {
+        var prevDenom = 1 / stfuUser.currentRate;
+
+        var newDenom = prevDenom + diff;
+
+        stfuUser.currentRate = 2 / newDenom;
+      }
+      else {
+        stfuUser.currentRate = 1 / diff;
+      }
+
+      if(stfuUser.currentRate > 0.00003333333333) { //1/30 seconds
+        slack.chat.postMessage({
+          token: process.env.SLACK_TOKEN,
+          channel: channel,
+          text: 'Please try to keep conversations short and to the point.'
+        }, function(err, data){
+          console.log("postMessage data:")
+          console.log(data);
+          console.log("postMessage err:");
+          console.log(err);
+        });
+      }
+    }
+
+    stfuUser.lastPostTime = now;
   }
 
   res.end('OK');
 });
 
-app.post('/limit', function(req, res) {
+app.post('/slash', function(req, res) {
   console.log("Recieved slash command", req.body);
 
   var command = req.body.command;
@@ -66,9 +100,31 @@ app.post('/limit', function(req, res) {
   var userName = req.body.user_name;
   var text = req.body.text;
 
+  if(command === "/limit") {
+    var stfuUserId = text.replace("<", "").replace(">", "");
 
+    var stfuUser = stfuUsers[stfuUserId];
 
-  res.send('OK');
+    if(stfuUser) {
+      stfuUser.enabled = true;
+    }
+    else {
+      stfuUsers[stfuUserId] = {
+        enabled: true
+      };
+    }
+  }
+  else if(command === "/unlimit") {
+    var stfuUserId = text.replace("<", "").replace(">", "");
+
+    var stfuUser = stfuUsers[stfuUserId];
+
+    if(stfuUser) {
+      stfuUser.enabled = false;
+    }
+  }
+
+  res.end('OK');
 });
 
 console.log("Listening at " + ip + " on port " + port);
