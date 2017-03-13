@@ -15,6 +15,8 @@ function cleanMessage(message) {
   return message;
 }
 
+var stfuUsers = {};
+
 app.get('/', function (req, res) {
   // slack.chat.postMessage({
   //   token: process.env.SLACK_TOKEN,
@@ -31,7 +33,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/event', function(req, res) {
-  console.log("Recieved event: " + req.body);
+  console.log("Recieved event: ", req.body);
 
   if(req.body.challenge) {
     return req.body.challenge;
@@ -46,11 +48,15 @@ app.post('/event', function(req, res) {
   var ts = event.ts;
   var text = event.text;
 
+  if(stfuUsers[user]) {
+
+  }
+
   return 'OK';
 });
 
 app.post('/limit', function(req, res) {
-  console.log("Recieved slash command: " + req.body);
+  console.log("Recieved slash command", req.body);
 
   var command = req.body.command;
   var token = req.body.token; //TODO: validate against token provided when adding slack command in Slack
@@ -58,8 +64,9 @@ app.post('/limit', function(req, res) {
   var channelName = req.body.channel_name;
   var userId = req.body.user_id;
   var userName = req.body.user_name;
-
   var text = req.body.text;
+
+
 
   res.send('OK');
 });
