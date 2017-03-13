@@ -68,7 +68,7 @@ app.post('/event', function(req, res) {
     if(lastPostTime) {
       console.log("last post time is set");
 
-      var diff = now - lastPost;
+      var diff = now - lastPostTime;
 
       if(stfuUser.currentRate) {
         console.log("current rate is set at: " + stfuUser.currentRate);
@@ -147,7 +147,7 @@ app.post('/slash', function(req, res) {
     }
   }
   else if(command === "/unlimit") {
-    console.log("processing limit command");
+    console.log("processing unlimit command");
 
     if(token != process.env.SLASH_UNLIMIT_COMMAND_TOKEN) {
       console.log("Rejecting slash command: Invalid token");
