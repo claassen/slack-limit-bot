@@ -112,8 +112,16 @@ app.post('/event', function(req, res) {
 app.post('/slash', function(req, res) {
   console.log("Recieved slash command", req.body);
 
-  var command = req.body.command;
   var token = req.body.token; //TODO: validate against token provided when adding slack command in Slack
+
+  if(token != process.env.SLASH_COMMAND_TOKEN) {
+    console.log("Rejecting slash command: Invalid token");
+    
+    res.end('INVALID TOKEN');
+    return;
+  }
+
+  var command = req.body.command;
   var channelId = req.body.channel_id;
   var channelName = req.body.channel_name;
   var userId = req.body.user_id;
