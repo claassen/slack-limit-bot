@@ -28,10 +28,23 @@ app.get('/', function (req, res) {
 });
 
 app.post('/event', function(req, res) {
+  console.log("Recieved event: " + req.body);
+
   if(req.body.challenge) {
     return req.body.challenge;
   }
-};
+
+  var token = req.body.token; //TODO: validate
+
+  var event = req.body.event;
+
+  var user = event.user;
+  var channel = event.channel;
+  var ts = event.ts;
+  var text = event.text;
+
+  return 'OK';
+});
 
 app.post('/limit', function(req, res) {
   console.log("Recieved slash command: " + req.body);
