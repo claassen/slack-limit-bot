@@ -51,26 +51,39 @@ app.post('/event', function(req, res) {
 
   var stfuUser = stfuUsers[user];
 
+  console.log("stfuUsers: ", stfuUsers);
+  console.log("stfuUser: ", stfuUser);
+
   if(stfuUser && stfuUser.enabled) {
     var now = Date.now();
 
     var lastPostTime = stfuUser.lastPostTime;
 
     if(lastPostTime) {
+      console.log("last post time is set");
+
       var diff = now - lastPost;
 
       if(stfuUser.currentRate) {
+        console.log("current rate is set at: " + stfuUser.currentRate);
+
         var prevDenom = 1 / stfuUser.currentRate;
 
         var newDenom = prevDenom + diff;
 
+        console.log("updating to: " + 2 / newDenom);
+
         stfuUser.currentRate = 2 / newDenom;
       }
       else {
+        console.log("current rate is not set, setting to: " + 1/diff);
+
         stfuUser.currentRate = 1 / diff;
       }
 
       if(stfuUser.currentRate > 0.00003333333333) { //1/30 seconds
+        console.log("rate exceeds limit, posting message");
+        
         slack.chat.postMessage({
           token: process.env.SLACK_TOKEN,
           channel: channel,
