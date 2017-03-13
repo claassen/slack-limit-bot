@@ -37,6 +37,7 @@ app.post('/event', function(req, res) {
 
   if(req.body.challenge) {
     res.end(req.body.challenge);
+    return;
   }
 
   var token = req.body.token; //TODO: validate
@@ -101,7 +102,7 @@ app.post('/slash', function(req, res) {
   var text = req.body.text;
 
   if(command === "/limit") {
-    var stfuUserId = text.replace("<", "").replace(">", "");
+    var stfuUserId = text.split("|")[0].replace("@", "").replace("<", "").replace(">", "");
 
     var stfuUser = stfuUsers[stfuUserId];
 
@@ -117,11 +118,7 @@ app.post('/slash', function(req, res) {
   else if(command === "/unlimit") {
     var stfuUserId = text.replace("<", "").replace(">", "");
 
-    var stfuUser = stfuUsers[stfuUserId];
-
-    if(stfuUser) {
-      stfuUser.enabled = false;
-    }
+    stfuUsers[stfuUserId] = undefined;
   }
 
   res.end('OK');
