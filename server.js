@@ -114,13 +114,6 @@ app.post('/slash', function(req, res) {
 
   var token = req.body.token; //TODO: validate against token provided when adding slack command in Slack
 
-  if(token != process.env.SLASH_COMMAND_TOKEN) {
-    console.log("Rejecting slash command: Invalid token");
-    
-    res.end('INVALID TOKEN');
-    return;
-  }
-
   var command = req.body.command;
   var channelId = req.body.channel_id;
   var channelName = req.body.channel_name;
@@ -130,6 +123,13 @@ app.post('/slash', function(req, res) {
 
   if(command === "/limit") {
     console.log("processing limit command");
+
+    if(token != process.env.SLASH_LIMIT_COMMAND_TOKEN) {
+      console.log("Rejecting slash command: Invalid token");
+
+      res.end('INVALID TOKEN');
+      return;
+    }
 
     var stfuUserId = text.split("|")[0].replace("@", "").replace("<", "").replace(">", "");
 
@@ -148,6 +148,13 @@ app.post('/slash', function(req, res) {
   }
   else if(command === "/unlimit") {
     console.log("processing limit command");
+
+    if(token != process.env.SLASH_UNLIMIT_COMMAND_TOKEN) {
+      console.log("Rejecting slash command: Invalid token");
+
+      res.end('INVALID TOKEN');
+      return;
+    }
 
     var stfuUserId = text.split("|")[0].replace("@", "").replace("<", "").replace(">", "");
 
