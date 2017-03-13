@@ -8,7 +8,7 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-    
+
 function cleanMessage(message) {
   //...
 
@@ -31,7 +31,6 @@ app.get('/', function (req, res) {
 });
 
 app.post('/event', function(req, res) {
-  console.log(req);
   console.log("Recieved event: " + req.body);
 
   if(req.body.challenge) {
