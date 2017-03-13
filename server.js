@@ -61,8 +61,8 @@ app.post('/limit', function(req, res) {
   res.send('OK');
 });
 
-app.use(express.bodyParser.urlencoded({ extended: true }));
-app.use(express.bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 console.log("Listening at " + ip + " on port " + port);
 
