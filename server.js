@@ -36,7 +36,7 @@ app.post('/event', function(req, res) {
   console.log("Recieved event: ", req.body);
 
   if(req.body.challenge) {
-    return req.body.challenge;
+    res.end(req.body.challenge);
   }
 
   var token = req.body.token; //TODO: validate
@@ -52,7 +52,7 @@ app.post('/event', function(req, res) {
 
   }
 
-  return 'OK';
+  res.end('OK');
 });
 
 app.post('/limit', function(req, res) {
