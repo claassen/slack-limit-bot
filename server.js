@@ -6,6 +6,9 @@ var bodyParser = require('body-parser');
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+    
 function cleanMessage(message) {
   //...
 
@@ -28,6 +31,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/event', function(req, res) {
+  console.log(req);
   console.log("Recieved event: " + req.body);
 
   if(req.body.challenge) {
@@ -60,9 +64,6 @@ app.post('/limit', function(req, res) {
 
   res.send('OK');
 });
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
 console.log("Listening at " + ip + " on port " + port);
 
