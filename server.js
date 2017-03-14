@@ -59,9 +59,9 @@ app.post('/event', function(req, res) {
         userLimit.currentRate = 2 / newDenom;
       }
       else {
-        console.log("current rate is not set, setting to: " + 1/diff);
+        console.log("current rate is not set, setting to: " + 1 / diff);
 
-        userLimit.currentRate = 1 / diff;
+        userLimit.currentRate = 2 / (diff + userLimit.limitWindow);
       }
 
       if(userLimit.currentRate > userLimit.limit) {
