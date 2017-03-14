@@ -82,7 +82,7 @@ app.post('/event', function(req, res) {
           slack.chat.postMessage({
             token: process.env.SLACK_TOKEN,
             channel: channel,
-            text: 'Please try to keep conversations short and to the point. This message is a warning, further messages which exceed the message posting rate limit will be deleted!'
+            text: '@' + limitUser.userName + ' Please try to keep conversations short and to the point. This message is a warning, further messages which exceed the message posting rate limit will be deleted!'
           }, function(err, data){
             if(err) {
               console.log("Error: ", err);
@@ -133,6 +133,7 @@ app.post('/slash', function(req, res) {
     }
 
     var limitUserId = requestParams[0].split("|")[0].replace("@", "").replace("<", "").replace(">", "");
+    var limitUserName = requestParams[0].split("|")[1].replace("<", "").replace(">", "");
 
     //Minimum number of seconds per message limit. i.e. If limit is 30, the user will be limited to 1 message every 30 seconds.
     var limit = requestParams[1].trim();
@@ -144,7 +145,8 @@ app.post('/slash', function(req, res) {
     userLimits[limitUserId] = {
       enabled: true,
       limit: 1 / (limit * 1000),
-      limitWindow: 1 / (limitWindow * 1000)
+      limitWindow: 1 / (limitWindow * 1000),
+      userName: limitUserName
     };
   }
   else if(command === "/unlimit") {
