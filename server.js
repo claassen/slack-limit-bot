@@ -98,6 +98,11 @@ app.post('/slash', function(req, res) {
 
   var requestParams = text.split(" ");
 
+  if(requestParams.length != 2) {
+    res.end("Usage: /limit @user <limit>");
+    return;
+  }
+
   if(command === "/limit") {
     console.log("processing limit command");
 
