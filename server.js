@@ -50,7 +50,7 @@ app.post('/event', function(req, res) {
       if(userLimit.currentRate) {
         console.log("current rate is set at: " + userLimit.currentRate);
 
-        var prevDenom = 1 / userLimit.currentRate;
+        var prevDenom = Math.max(1 / userLimit.currentRate, userLimit.limitWindow);
         var newDenom = prevDenom + diff;
 
         console.log("updating to: " + 2 / newDenom);
@@ -98,13 +98,13 @@ app.post('/slash', function(req, res) {
 
   var requestParams = text.split(" ");
 
-  if(requestParams.length != 2) {
-    res.end("Usage: /limit @user <limit>");
-    return;
-  }
-
   if(command === "/limit") {
     console.log("processing limit command");
+
+    if(requestParams.length != 3) {
+      res.end("Usage: /limit @user <limit> <window>");
+      return;
+    }
 
     if(token != process.env.SLASH_LIMIT_COMMAND_TOKEN) {
       console.log("Rejecting slash command: Invalid token");
@@ -117,13 +117,15 @@ app.post('/slash', function(req, res) {
 
     //Minimum number of seconds per message limit. i.e. If limit is 30, the user will be limited to 1 message every 30 seconds.
     var limit = requestParams[1].trim();
+    var limitWindow = requestParams[2].trim();
 
     console.log("user id: " + limitUserId);
     console.log("limit to: 1 message/" + limit + " seconds");
 
     userLimits[limitUserId] = {
       enabled: true,
-      limit: 1 / (limit * 1000)
+      limit: 1 / (limit * 1000),
+      limitWindow: 1 / (limitWindow * 1000)
     };
   }
   else if(command === "/unlimit") {
