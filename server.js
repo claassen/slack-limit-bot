@@ -32,6 +32,7 @@ app.post('/event', function(req, res) {
 
   var userId = event.user;
   var channel = event.channel;
+  var ts = event.ts;
   var text = event.text;
 
   var userLimit = userLimits[userId];
@@ -66,15 +67,33 @@ app.post('/event', function(req, res) {
       if(userLimit.currentRate > userLimit.limit) {
         console.log("rate exceeds limit");
 
-        slack.chat.postMessage({
-          token: process.env.SLACK_TOKEN,
-          channel: channel,
-          text: 'Please try to keep conversations short and to the point.'
-        }, function(err, data){
-          if(err) {
-            console.log("Error: ", err);
-          }
-        });
+        if(userLimit.warned) {
+          slack.chat.delete({
+            token: process.env.SLACK_TOKEN,
+            ts: ts,
+            channel: channel
+          }, function(err, data){
+            if(err) {
+              console.log("Error: ", err);
+            }
+          });
+        }
+        else {
+          slack.chat.postMessage({
+            token: process.env.SLACK_TOKEN,
+            channel: channel,
+            text: 'Please try to keep conversations short and to the point.'
+          }, function(err, data){
+            if(err) {
+              console.log("Error: ", err);
+            }
+          });
+        }
+
+        userLimit.warned = true;
+      }
+      else {
+        userLimit.warned = false;
       }
     }
 
