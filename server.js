@@ -118,7 +118,7 @@ app.post('/slash', function(req, res) {
 
     userLimits[limitUserId] = {
       enabled: true,
-      limit = 1 / (limit * 1000)
+      limit: 1 / (limit * 1000)
     };
   }
   else if(command === "/unlimit") {
