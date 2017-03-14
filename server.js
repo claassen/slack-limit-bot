@@ -82,7 +82,7 @@ app.post('/event', function(req, res) {
           slack.chat.postMessage({
             token: process.env.SLACK_TOKEN,
             channel: channel,
-            text: 'Please try to keep conversations short and to the point.'
+            text: 'Please try to keep conversations short and to the point. This message is a warning, further messages which exceed the message posting rate limit will be deleted!'
           }, function(err, data){
             if(err) {
               console.log("Error: ", err);
