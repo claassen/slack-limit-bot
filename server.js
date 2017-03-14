@@ -9,28 +9,7 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-function cleanMessage(message) {
-  //...
-
-  return message;
-}
-
-var stfuUsers = {};
-
-app.get('/', function (req, res) {
-  // slack.chat.postMessage({
-  //   token: process.env.SLACK_TOKEN,
-  //   channel: 'test1234',
-  //   text: 'Test'
-  // }, function(err, data){
-  //   console.log("postMessage data:")
-  //   console.log(data);
-  //   console.log("postMessage err:");
-  //   console.log(err);
-  // });
-
-  res.send('OK');
-});
+var userLimits = {};
 
 app.post('/event', function(req, res) {
   console.log("Recieved event: ", req.body);
@@ -51,59 +30,55 @@ app.post('/event', function(req, res) {
     return;
   }
 
-  var user = event.user;
+  var userId = event.user;
   var channel = event.channel;
   var text = event.text;
 
-  var stfuUser = stfuUsers[user];
+  var userLimit = userLimits[userId];
 
-  console.log("stfuUsers: ", stfuUsers);
-  console.log("stfuUser: ", stfuUser);
+  console.log("userLimits: ", stfuUsers);
+  console.log("userLimit: ", stfuUser);
 
-  if(stfuUser && stfuUser.enabled) {
+  if(userLimit) {
     var now = Date.now();
 
-    var lastPostTime = stfuUser.lastPostTime;
+    var lastPostTime = userLimit.lastPostTime;
 
     if(lastPostTime) {
-      console.log("last post time is set");
-
       var diff = now - lastPostTime;
 
-      if(stfuUser.currentRate) {
+      if(userLimit.currentRate) {
         console.log("current rate is set at: " + stfuUser.currentRate);
 
-        var prevDenom = 1 / stfuUser.currentRate;
-
+        var prevDenom = 1 / userLimit.currentRate;
         var newDenom = prevDenom + diff;
 
         console.log("updating to: " + 2 / newDenom);
 
-        stfuUser.currentRate = 2 / newDenom;
+        userLimit.currentRate = 2 / newDenom;
       }
       else {
         console.log("current rate is not set, setting to: " + 1/diff);
 
-        stfuUser.currentRate = 1 / diff;
+        userLimit.currentRate = 1 / diff;
       }
 
-      if(stfuUser.currentRate > 0.00003333333333) { //1/30 seconds
-        console.log("rate exceeds limit, posting message");
+      if(userLimit.currentRate > userLimit.limit) {
+        console.log("rate exceeds limit");
 
         slack.chat.postMessage({
           token: process.env.SLACK_TOKEN,
           channel: channel,
           text: 'Please try to keep conversations short and to the point.'
         }, function(err, data){
-          console.log("postMessage data:")
-          console.log(data);
-          console.log("postMessage err:");
-          console.log(err);
+          if(err) {
+            console.log("Error: ", err);
+          }
         });
       }
     }
 
-    stfuUser.lastPostTime = now;
+    userLimit.lastPostTime = now;
   }
 
   res.end('OK');
@@ -112,7 +87,7 @@ app.post('/event', function(req, res) {
 app.post('/slash', function(req, res) {
   console.log("Recieved slash command", req.body);
 
-  var token = req.body.token; //TODO: validate against token provided when adding slack command in Slack
+  var token = req.body.token;
 
   var command = req.body.command;
   var channelId = req.body.channel_id;
@@ -120,6 +95,8 @@ app.post('/slash', function(req, res) {
   var userId = req.body.user_id;
   var userName = req.body.user_name;
   var text = req.body.text;
+
+  var requestParams = text.split(" ");
 
   if(command === "/limit") {
     console.log("processing limit command");
@@ -131,20 +108,18 @@ app.post('/slash', function(req, res) {
       return;
     }
 
-    var stfuUserId = text.split("|")[0].replace("@", "").replace("<", "").replace(">", "");
+    var limitUserId = requestParams[0].split("|")[0].replace("@", "").replace("<", "").replace(">", "");
 
-    console.log("user id: " + stfuUserId);
+    //Minimum number of seconds per message limit. i.e. If limit is 30, the user will be limited to 1 message every 30 seconds.
+    var limit = requestParams[1].trim();
 
-    var stfuUser = stfuUsers[stfuUserId];
+    console.log("user id: " + limitUserId);
+    console.log("limit to: 1 message/" + limit + " seconds");
 
-    if(stfuUser) {
-      stfuUser.enabled = true;
-    }
-    else {
-      stfuUsers[stfuUserId] = {
-        enabled: true
-      };
-    }
+    userLimits[limitUserId] = {
+      enabled: true,
+      limit = 1 / (limit * 1000)
+    };
   }
   else if(command === "/unlimit") {
     console.log("processing unlimit command");
@@ -156,11 +131,11 @@ app.post('/slash', function(req, res) {
       return;
     }
 
-    var stfuUserId = text.split("|")[0].replace("@", "").replace("<", "").replace(">", "");
+    var limitUserId = text.split("|")[0].replace("@", "").replace("<", "").replace(">", "");
 
     console.log("user id: " + stfuUserId);
 
-    stfuUsers[stfuUserId] = undefined;
+    userLimits[limitUserId] = undefined;
   }
 
   res.end('OK');
