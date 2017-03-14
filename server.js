@@ -36,8 +36,8 @@ app.post('/event', function(req, res) {
 
   var userLimit = userLimits[userId];
 
-  console.log("userLimits: ", stfuUsers);
-  console.log("userLimit: ", stfuUser);
+  console.log("userLimits: ", userLimits);
+  console.log("userLimit: ", userLimit);
 
   if(userLimit) {
     var now = Date.now();
@@ -48,7 +48,7 @@ app.post('/event', function(req, res) {
       var diff = now - lastPostTime;
 
       if(userLimit.currentRate) {
-        console.log("current rate is set at: " + stfuUser.currentRate);
+        console.log("current rate is set at: " + userLimit.currentRate);
 
         var prevDenom = 1 / userLimit.currentRate;
         var newDenom = prevDenom + diff;
@@ -138,7 +138,7 @@ app.post('/slash', function(req, res) {
 
     var limitUserId = text.split("|")[0].replace("@", "").replace("<", "").replace(">", "");
 
-    console.log("user id: " + stfuUserId);
+    console.log("user id: " + limitUserId);
 
     userLimits[limitUserId] = undefined;
   }
